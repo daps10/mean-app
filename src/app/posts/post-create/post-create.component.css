@@ -3,3 +3,7 @@ textarea {
   width: 100%;
   border: 1px black;
 }
+
+mat-spinner {
+  margin: auto;
+}
