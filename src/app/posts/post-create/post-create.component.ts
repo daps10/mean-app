@@ -102,7 +102,7 @@ export class PostCreateComponent implements OnInit {
     
             this.isLoading=false;
             // with the help of service
-            this.postService.addPost(this.form.value.title, this.form.value.content)
+            this.postService.addPost(this.form.value.title, this.form.value.content, this.form.value.image)
                    
         } else {
             this.postService.updatePost(
