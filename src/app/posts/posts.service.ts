@@ -22,11 +22,12 @@ export class PostService {
         )
         .pipe(
             map((postData) =>{
-                return postData.posts.map((post: { title: any; content: any; _id: any; }) => {
+                return postData.posts.map((post: { title: any; content: any; _id: any; imagePath:any; }) => {
                     return {
                         title:post.title,
                         content:post.content,
-                        id:post._id
+                        id:post._id,
+                        imagePath:post.imagePath
                     };
                 })
             })
@@ -53,15 +54,14 @@ export class PostService {
         postData.append("content", content);
         postData.append("image", image, title);
 
-        this.http.post<{message:string, postId:string}>("http://localhost:3000/api/posts", postData)
+        this.http.post<{message:string, post:Post}>("http://localhost:3000/api/posts", postData)
             .subscribe((responseData) => {
                 const post: Post = { 
-                    id:responseData.postId,
+                    id:responseData.post.id,
                     title:title,
-                    content:content
+                    content:content,
+                    imagePath:responseData.post.imagePath
                 }
-                const postId = responseData.postId;
-                post.id = postId;
                 this.posts.push(post);
                 this.postUpdated.next([...this.posts])
                 this.router.navigate(["/"])
@@ -70,7 +70,7 @@ export class PostService {
     }
 
     updatePost(id:string, title:string, content: string) {
-        const post: Post = {id:id, title:title, content:content}
+        const post: Post = {id:id, title:title, content:content, imagePath:''}
         this.http.put<{message:string, postId:string}>("http://localhost:3000/api/posts/" + id, post)
             .subscribe((responseData) => {
                const updatedPosts =[...this.posts]
