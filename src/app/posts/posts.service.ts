@@ -68,6 +68,7 @@ export class PostService {
                updatedPosts[oldPostIndex] = post;
                this.posts = updatedPosts;
                this.postUpdated.next([...this.posts])
+               this.router.navigate(["/"])
             });
 
     }
