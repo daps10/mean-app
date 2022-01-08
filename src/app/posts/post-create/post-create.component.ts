@@ -1,6 +1,6 @@
 // EventEmitter, Output during event binding time needed
 import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Post } from '../post.model';
 import { PostService } from '../posts.service';
@@ -18,13 +18,31 @@ export class PostCreateComponent implements OnInit {
     private mode = 'create';
     private postId: any;
     public post: any;
-
+    form!: FormGroup;
     // when we use service that time we dont require it
     // @Output() postCreated = new EventEmitter();
 
-    constructor(public postService:PostService, public route:ActivatedRoute) {}
+    constructor(
+        public postService:PostService, 
+        public route:ActivatedRoute,
+
+        ) {}
 
     ngOnInit(): void {
+        this.form = new FormGroup({
+            title: new FormControl(null, {
+                validators:[
+                    Validators.required, 
+                    Validators.minLength(4)
+                ]            
+            }),
+            content : new FormControl(null, {
+                validators: [
+                    Validators.required
+                ]
+            })
+        });
+
         this.route.paramMap.subscribe((paramMap:ParamMap) => {
             if(paramMap.has('postId')){
                 this.mode="edit";
@@ -33,6 +51,10 @@ export class PostCreateComponent implements OnInit {
                 this.postService.getPost(this.postId).subscribe(postData => {
                     this.isLoading=false;
                     this.post = {id:postData._id, title:postData.title,content:postData.content}
+                    this.form.setValue({
+                        title: this.post.title,
+                        content:this.post.content
+                    })
                 });               
             } else {
                 this.mode="create";
@@ -41,8 +63,8 @@ export class PostCreateComponent implements OnInit {
         })
     }
 
-    onSavePost(form:NgForm){
-        if(form.invalid) {
+    onSavePost(){
+        if(this.form.invalid) {
             return
         }
 
@@ -57,17 +79,17 @@ export class PostCreateComponent implements OnInit {
     
             this.isLoading=false;
             // with the help of service
-            this.postService.addPost(form.value.title, form.value.content)
+            this.postService.addPost(this.form.value.title, this.form.value.content)
                    
         } else {
             this.postService.updatePost(
                 this.postId,
-                form.value.title, 
-                form.value.content
+                this.form.value.title, 
+                this.form.value.content
                 )
                 this.isLoading=false;
         }
-        form.resetForm();
+        this.form.reset();
     }
 
 }
