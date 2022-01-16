@@ -6,8 +6,13 @@ import { AuthData } from './auth-data.model';
     providedIn:"root"
 })
 export class AuthService {
+    private token: any;
     constructor( private http:HttpClient ) {}
- 
+
+    getToken () {
+        return this.token;
+    }
+
     createUser (name: string, email:string, password:string ) {
         const authData:AuthData = {
             name:name,
@@ -26,9 +31,10 @@ export class AuthService {
             password:password,
             name:""
         }
-        this.http.post("http://localhost:3000/api/user/login", authData)
+        this.http.post<{token:string}>("http://localhost:3000/api/user/login", authData)
             .subscribe(response => {
-                console.log(response)
+                const token= response.token;
+                this.token=token;
             })
     }
 }
