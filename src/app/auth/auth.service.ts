@@ -13,6 +13,7 @@ export class AuthService {
     private authStatusListener= new Subject<boolean>();
   
     constructor( private http:HttpClient, private router: Router ) {}
+    
     getToken () {
         return this.token;
     }
