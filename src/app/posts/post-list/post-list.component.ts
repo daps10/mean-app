@@ -1,6 +1,7 @@
 import { Component,Input, OnDestroy, OnInit } from "@angular/core";
 import { PageEvent } from "@angular/material/paginator";
 import { Subscription } from "rxjs";
+import { AuthService } from "src/app/auth/auth.service";
 
 import { Post } from "../post.model";
 import { PostService } from "../posts.service";
@@ -10,24 +11,17 @@ import { PostService } from "../posts.service";
     styleUrls: ['./post-list.component.css']
 })
 export class PostListComponent implements OnInit {
-    // posts =[
-    //     {title:'first post', content:'This is the first post\'s content.'},
-    //     {title:'second post', content:'This is the second post\'s content.'},
-    //     {title:'third post', content:'This is the third post\'s content.'},
-    //     {title:'fourth post', content:'This is the fourth post\'s content.'},
-    // ];
-    // @Input() posts:Post[] = [];
-
     posts:Post[] = [];
     isLoading=false;
     totalPosts=0;
     postsPerPage=2;
     currentPage=1;
     pageSizeOptions=[1,2,5,10];
+    userIsAuthenticated= false;
     private postsSub!: Subscription;
+    private authServiceSub!: Subscription;
 
-    constructor(public postsService:PostService) {}
-
+    constructor(public postsService:PostService, private authService:AuthService) {}
     ngOnInit(): void {
         this.isLoading=true;
         this.postsService.getPosts(this.postsPerPage, this.currentPage); // get post service called
@@ -36,6 +30,13 @@ export class PostListComponent implements OnInit {
                 this.isLoading=false;
                 this.totalPosts= postsData.postCount
                 this.posts=postsData.posts;
+            })
+
+        this.userIsAuthenticated= this.authService.getIsAuth();
+
+        this.authServiceSub= this.authService.getAuthStatusListener()
+            .subscribe(isAuthenticated => {
+                this.userIsAuthenticated= isAuthenticated;
             })
     }
 
@@ -57,5 +58,6 @@ export class PostListComponent implements OnInit {
 
     ngOnDestroy(): void {
         this.postsSub.unsubscribe();
+        this.authServiceSub.unsubscribe();
     }
 }
