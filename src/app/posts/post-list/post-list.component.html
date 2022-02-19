@@ -11,10 +11,10 @@
         </div>
 
         <p>{{post.content}}</p>
-        <mat-action-row>
+        <mat-action-row *ngIf="userIsAuthenticated">
             <a mat-raised-button color="primary" [routerLink]="['/edit',post.id]">EDIT</a>
             <button mat-raised-button color="warn" (click)="onDelete(post.id)">DELETE</button>
-          </mat-action-row>
+        </mat-action-row>
     </mat-expansion-panel>
 </mat-accordion>
 <mat-paginator [length]="totalPosts" [pageSize]="postsPerPage" [pageSizeOptions]="pageSizeOptions" (page)="onChangePage($event)" *ngIf="posts.length >0"></mat-paginator>
