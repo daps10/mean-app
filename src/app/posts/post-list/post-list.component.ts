@@ -22,7 +22,11 @@ export class PostListComponent implements OnInit {
     private postsSub!: Subscription;
     private authServiceSub!: Subscription;
 
-    constructor(public postsService:PostService, private authService:AuthService) {}
+    constructor(
+        public postsService:PostService, 
+        private authService:AuthService
+    ) {}
+    
     ngOnInit(): void {
         this.isLoading=true;
         this.postsService.getPosts(this.postsPerPage, this.currentPage); // get post service called
