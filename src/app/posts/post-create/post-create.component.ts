@@ -1,7 +1,9 @@
 // EventEmitter, Output during event binding time needed
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { AuthService } from 'src/app/auth/auth.service';
 import { Post } from '../post.model';
 import { PostService } from '../posts.service';
 
@@ -13,13 +15,15 @@ import { mimeType } from './mime-type.validator';
     templateUrl:'./post-create.component.html',
     styleUrls:['./post-create.component.css']
 })
-export class PostCreateComponent implements OnInit {
+export class PostCreateComponent implements OnInit, OnDestroy {
     enteredTitle = '';
     enteredContent = '';
     isLoading = false;
     imagePreview:any;
     private mode = 'create';
     private postId: any;
+    private authStatusSub!: Subscription;
+
     public post: any;
     form!: FormGroup;
     // when we use service that time we dont require it
@@ -28,10 +32,13 @@ export class PostCreateComponent implements OnInit {
     constructor(
         public postService:PostService, 
         public route:ActivatedRoute,
-
+        private authService: AuthService
         ) {}
 
     ngOnInit(): void {
+        this.authService.getAuthStatusListener().subscribe(authStatus => {
+            this.isLoading= false;
+        })
         this.form = new FormGroup({
             title: new FormControl(null, {
                 validators:[
@@ -127,4 +134,7 @@ export class PostCreateComponent implements OnInit {
         this.form.reset();
     }
 
+    ngOnDestroy(): void {
+        this.authStatusSub.unsubscribe();
+    }   
 }
